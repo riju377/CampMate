@@ -1,0 +1,76 @@
+<% layout("layouts/boilerPlate") %>
+
+    <div class="row">
+        <h2 class="text-center mb-3">Edit Campground</h2>
+        <div class="col-6 offset-3">
+            <form action="/campgrounds/<%= selectedCamp.id%>?_method=PUT" method="post" class="needs-validation"
+                enctype="multipart/form-data" novalidate>
+
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" name="campground[title]" id="title" class="form-control"
+                        value="<%= selectedCamp.title%>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        Please select a valid title.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="location" class="form-label">Location</label>
+                    <input type="text" name="campground[location]" id="location" class="form-control"
+                        value="<%= selectedCamp.location%>" required>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        Please select a valid location.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <input type="file" name="campground[name]" id="name" multiple>
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea name="campground[description]" id="description" class="form-control"
+                        required><%=selectedCamp.description%></textarea>
+                    <div class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div class="invalid-feedback">
+                        Please give a valid description.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price</label>
+                    <div class="input-group">
+                        <span class="input-group-text" id="price-label">$</span>
+                        <input type="number" class="form-control" placeholder="0.00" aria-label="price" id="price"
+                            aria-describedby="price-label" name="campground[price]" value="<%= selectedCamp.price%>"
+                            required>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please provide a valid price.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <button class="btn btn-info" type="submit">Update Campground</button>
+                </div>
+
+            </form>
+
+            <div class="mb-3">
+                <a href="/campgrounds">All Campgrounds</a>
+            </div>
+
+        </div>
+    </div>
