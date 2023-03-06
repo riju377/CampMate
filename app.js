@@ -85,8 +85,8 @@ app.use('/campgrounds/:id/reviews', reviewRouter);
 app.use('/', userRouter);
 
 
-app.get("/", catchAsync((req, res) => {
-    res.render("home.ejs");
+app.get("/", catchAsync(async (req, res) => {
+    res.redirect("/campgrounds");
 }))
 
 
