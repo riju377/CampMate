@@ -11,7 +11,7 @@ const flash = require('connect-flash');
 const User = require('./models/user')
 const passport = require('passport');
 const LocalStrategy = require("passport-local");
-const MongoStore = require('connect-mongo');
+const MongoStore = require('connect-mongo')(session);
 
 const app = express();
 
@@ -28,7 +28,8 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 
-const mongoUrl = process.env.MONGO_CLOUD || 'mongodb://localhost:27017/yelpCamp';
+const mongoUrl = process.env.MONGO_CLOUD;
+
 mongoose.set('strictQuery', true);
 
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -43,23 +44,44 @@ mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
 
 const secret = process.env.SECRET || "thisshouldbeabettersecret";
 
-const sessionConfig = {
-    store: MongoStore.create({
-        mongoUrl: mongoUrl,
-    }),
-    name: 'session',
+const store = new MongoStore({
+    url: mongoUrl,
     secret,
+    touchAfter: 24 * 60 * 60
+});
+
+store.on("error", function (e) {
+    console.log("SESSION STORE ERROR", e)
+})
+
+const sessionConfig = {
+    store,
+    name: 'session',
+    secret: secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
+        // secure: true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
 }
 
+
+
+
 app.use(session(sessionConfig))
 app.use(flash());
+
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+})
+
+
+
 app.use(passport.initialize())
 app.use(passport.session())
 passport.use(new LocalStrategy(User.authenticate()));
@@ -69,8 +91,6 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
-    res.locals.success = req.flash('success');
-    res.locals.error = req.flash('error');
     next();
 })
 
@@ -86,15 +106,17 @@ app.use('/', userRouter);
 
 
 app.get("/", catchAsync(async (req, res) => {
-    res.redirect("/campgrounds");
+    res.render('campgrounds/home');
 }))
 
 
 app.all('*', (req, res, next) => {
+    console.log("hit1!!!");
     next(new ExpressError('Page not found!!', 404));
 })
 
 app.use((err, req, res, next) => {
+    console.log("hit2!!!");
     const { statusCode = 500 } = err;
     if (!err.message) err.message = 'Something Went wrong!';
     res.status(statusCode).render("error.ejs", { err });
