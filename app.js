@@ -99,15 +99,14 @@ const campgroundRouter = require('./routes/campgrounds');
 const reviewRouter = require('./routes/reviews');
 const userRouter = require('./routes/user');
 
+app.get("/", catchAsync(async (req, res) => {
+    res.render('campgrounds/home');
+}))
+
 
 app.use('/campgrounds', campgroundRouter);
 app.use('/campgrounds/:id/reviews', reviewRouter);
 app.use('/', userRouter);
-
-
-app.get("/", catchAsync(async (req, res) => {
-    res.render('campgrounds/home');
-}))
 
 
 app.all('*', (req, res, next) => {
