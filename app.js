@@ -100,7 +100,7 @@ const reviewRouter = require('./routes/reviews');
 const userRouter = require('./routes/user');
 
 app.get("/", catchAsync(async (req, res) => {
-    res.render('campgrounds/home');
+    res.render('home');
 }))
 
 
